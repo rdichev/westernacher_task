@@ -1,0 +1,51 @@
+plugins {
+    id 'java'
+}
+
+group 'org.westernacher_task'
+version '1.0-SNAPSHOT'
+
+ext {
+    // The drivers we want to use
+    drivers = ["firefox", "chrome", "chromeHeadless", "edge", "opera"]
+
+    ext {
+        seleniumVersion = '3.141.59'
+        webdriverManagerVersion = '4.2.2'
+        logbackVersion = '1.2.3'
+        junitVersion = '5.6.0'
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src']
+        }
+    }
+}
+dependencies {
+    compile "org.junit.jupiter:junit-jupiter:$junitVersion"
+    // Drivers
+    compile "org.seleniumhq.selenium:selenium-java:$seleniumVersion"
+    compile "org.seleniumhq.selenium:selenium-api:$seleniumVersion"
+    compile "org.seleniumhq.selenium:selenium-chrome-driver:$seleniumVersion"
+    compile "org.seleniumhq.selenium:selenium-firefox-driver:$seleniumVersion"
+    compile "org.seleniumhq.selenium:selenium-opera-driver:$seleniumVersion"
+    compile "org.seleniumhq.selenium:selenium-ie-driver:$seleniumVersion"
+    compile "io.github.bonigarcia:webdrivermanager:$webdriverManagerVersion"
+
+    // logging
+    compile("ch.qos.logback:logback-classic:$logbackVersion")
+    compile("ch.qos.logback:logback-core:$logbackVersion")
+
+    // faker
+    compile group: 'com.github.javafaker', name: 'javafaker', version: '1.0.2'
+}
+
+test {
+    useJUnitPlatform()
+}
