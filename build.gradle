@@ -41,9 +41,6 @@ dependencies {
     // logging
     compile("ch.qos.logback:logback-classic:$logbackVersion")
     compile("ch.qos.logback:logback-core:$logbackVersion")
-
-    // faker
-    compile group: 'com.github.javafaker', name: 'javafaker', version: '1.0.2'
 }
 
 test {

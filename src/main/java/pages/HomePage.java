@@ -1,6 +1,7 @@
 package main.java.pages;
 
 import java.util.List;
+import main.java.enumeration.LocalizationEnum;
 import main.java.utils.WaitUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -8,14 +9,30 @@ import org.openqa.selenium.WebElement;
 
 public class HomePage extends BasePage {
 
-    By addButton = By.xpath("//button[normalize-space()='Add']");
+    private By addButton = By.xpath("//button[normalize-space()='Add']");
 
     //Leaves list
-    By tableRows = By.cssSelector("tr.ng-star-inserted");
-    By emptyLeaveList = By.cssSelector("tr.empty.fullwidth.ng-star-inserted");
+    private By tableRows = By.cssSelector("tr.ng-star-inserted");
+    private By emptyLeaveList = By.cssSelector("tr.empty.fullwidth.ng-star-inserted");
+    private By deleteButton = By.xpath("//button[text()='Delete']");
+    private By exportButton = By.xpath("//button[text()='Export']");
+    private By requestButton = By.xpath("//button[text()='Request']");
 
     //confirmation alert
-    By yesButton = By.cssSelector("ng-component.ng-star-inserted button.btn-primary");
+    private By confirmationPopUp = By.cssSelector("div.cdk-overlay-pane");
+    private By yesButton = By.cssSelector("ng-component.ng-star-inserted button.btn-primary");
+
+    //alert
+    private By alert = By.cssSelector("div.alert-success");
+
+    //export
+    private By exportDialog = By.cssSelector("div.cdk-overlay-pane");
+    private By printButton = By.cssSelector("mat-dialog-actions button.btn-primary");
+    private By cancelButton = By.cssSelector("mat-dialog-actions button:not(.btn-primary)");
+    private By saveButton = By.xpath("//button[text()='Save']");
+
+    //localization
+    By localSpan = By.cssSelector("span.ng-tns-c2-0.ng-star-inserted");
 
     public HomePage(WebDriver driver) {
         super.driver = driver;
@@ -55,29 +72,93 @@ public class HomePage extends BasePage {
 
     public AddPersonalLeavePage editLeaveRecord(int index) {
         List<WebElement> tableRowsEl = driver.findElements(tableRows);
-        tableRowsEl.get(index).findElements(By.cssSelector("td")).get(5).findElements(By.cssSelector("button")).get(0);
+        tableRowsEl.get(index).findElements(By.cssSelector("td"))
+                .get(5).findElements(By.cssSelector("button")).get(0).click();
         return new AddPersonalLeavePage(driver);
     }
 
     public void requestLeave(int index) {
         List<WebElement> tableRowsEl = driver.findElements(tableRows);
-        tableRowsEl.get(index).findElements(By.cssSelector("td")).get(5).findElements(By.cssSelector("button")).get(1);
-        //is there a page to return?
+        tableRowsEl.get(index).findElements(By.cssSelector("td")).get(5).findElement(requestButton).click();
+
+        WaitUtils waitUtils = new WaitUtils();
+        waitUtils.waitForElementToBePresent(By.cssSelector("td.accepted"), driver);
     }
 
     public void deleteLeaveRecord(int index) {
         List<WebElement> tableRowsEl = driver.findElements(tableRows);
-        tableRowsEl.get(index).findElements(By.cssSelector("td")).get(5)
-                .findElement(By.cssSelector("button.btn-default.ng-star-inserted"));
+        tableRowsEl.get(index).findElements(By.cssSelector("td")).get(5).findElement(deleteButton).click();
+    }
+
+    public void exportLeaveRecord(int index) {
+        List<WebElement> tableRowsEl = driver.findElements(tableRows);
+        WebElement exportBtn = tableRowsEl.get(index).findElements(By.cssSelector("td")).get(5)
+                .findElement(exportButton);
+        exportBtn.click();
     }
 
     public boolean isLeavesListEmpty() {
-        return driver.findElement(emptyLeaveList).isDisplayed();
+        List<WebElement> elements = driver.findElements(emptyLeaveList);
+        if (!elements.isEmpty()) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
-    public void confirmAlert() {
+    public void confirmDeletion() {
         WaitUtils waitUtils = new WaitUtils();
+        waitUtils.waitForElementToBeVisible(confirmationPopUp, driver);
         waitUtils.waitForElementToBeClickable(yesButton, driver);
         click(yesButton);
+        waitUtils.waitForInvisibilityOfElement(confirmationPopUp, driver);
     }
+
+    public void waitUntilLeaveIsAdded() {
+        WaitUtils waitUtils = new WaitUtils();
+        waitUtils.waitForElementToBeVisible(tableRows, driver);
+    }
+
+    public void waitForSuccessAlertDisplayed() {
+        WaitUtils waitUtils = new WaitUtils();
+        waitUtils.waitForElementToBeVisible(alert, driver);
+    }
+
+    public String getSuccessAlertText() {
+        return getText(alert);
+    }
+
+    public void waitForExportModalToBeDisplayed() {
+        WaitUtils waitUtils = new WaitUtils();
+        waitUtils.waitForElementToBeVisible(exportDialog, driver);
+    }
+
+    public void clickPrintButton() {
+        click(printButton);
+    }
+
+    public void clickCancelButton() {
+        click(cancelButton);
+    }
+
+    public void clickSaveButton() {
+        click(saveButton);
+    }
+
+    public boolean isLanguageSelected(LocalizationEnum localizationEnum) {
+        if (getText(localSpan).contains(localizationEnum.getValue())) {
+            return true;
+        } else {
+            return false;
+
+        }
+    }
+
+    public void selectLanguage(LocalizationEnum localizationEnum) {
+        if (!isLanguageSelected(localizationEnum)) {
+           click(localSpan);
+           click(By.xpath("//span[text()='" + localizationEnum.getValue() + "']"));
+        }
+    }
+
 }

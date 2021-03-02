@@ -22,4 +22,16 @@ public class WaitUtils {
         WebDriverWait wait = new WebDriverWait(driver, configFileReader.getDefaultWait());
         wait.until(ExpectedConditions.invisibilityOf(driver.findElement(by)));
     }
+
+    public void waitForElementToBeVisible(By by, WebDriver driver) {
+        WebDriverWait wait = new WebDriverWait(driver, configFileReader.getDefaultWait());
+        wait.until(ExpectedConditions.visibilityOfElementLocated(by));
+    }
+
+    public void waitForElementText(By by, String text, WebDriver driver) {
+        WebDriverWait wait = new WebDriverWait(driver, configFileReader.getDefaultWait());
+        wait.until(ExpectedConditions.textToBe(by, text));
+
+    }
+
 }
